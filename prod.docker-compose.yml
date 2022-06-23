@@ -1,9 +1,7 @@
 services:
   laminas:
-    build: .
+    image: laminas-app:0.1
     ports:
      - "8080:80"
     environment:
       - NAME=Pepe
-    volumes:
-     - ./app:/var/www

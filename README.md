@@ -104,7 +104,7 @@ for the `laminas` container created with `docker-compose`.
 Build and start the image and container using:
 
 ```bash
-$ docker-compose up -d --build
+$ docker-compose up --build
 ```
 
 At this point, you can visit http://localhost:8080 to see the site running.
@@ -119,8 +119,7 @@ $ docker-compose run laminas composer install
 
 Change permissions to cache folder to avoid errors
 ```bash
-$ cd data
-$ chmod 777 cache
+$ chmod 777 ./data/cache
 ```
 
 Some composer packages optionally use additional PHP extensions.  
@@ -288,3 +287,15 @@ More information:
 * https://docs.laminas.dev/laminas-log/intro/
 * https://docs.laminas.dev/laminas-log/writers/
 * https://docs.laminas.dev/laminas-stratigility/v3/error-handlers/#handling-php-errors-and-exceptions
+
+### Create docker image for production
+
+```bash
+$ docker build -f prod.Dockerfile -t laminas-app:0.1 ..
+```
+
+Execute: 
+
+```bash
+$ docker-compose -f prod.docker-compose up 
+```
