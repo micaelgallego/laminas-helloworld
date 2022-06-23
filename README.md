@@ -1,21 +1,5 @@
 # laminas-mvc-skeleton
 
-> ## 🇷🇺 Русским гражданам
-> 
-> Мы, участники Laminas, родились и живем в разных странах. У многих из нас есть друзья, родственники и коллеги как в России, так и в Украине. Некоторые из нас родились в России. Некоторые из нас живут в России. У некоторых бабушки и дедушки сражались с фашистами во Второй мировой войне. Здесь никто не поддерживает фашизм.
-> 
-> У одного из нас есть украинская родственница, которая спаслась из дома вместе с сыном. Поезд задержался из-за бомбежки на дороге впереди. У нас есть друзья, которые прячутся в бомбоубежищах. Мы с тревогой ждем весточки от них после воздушных налетов, которые беспорядочно наносят удары и попадают по больницам, школам, детским садам и домам. Мы не берем это из каких-либо СМИ. Мы наблюдаем это напрямую.
-> 
-> Вы доверяете нам достаточно, чтоб использовать наши программы, и мы просим вас довериться нам вновь. Мы нуждаемся в помощи. Выходите и протестуйте против этой бесполезной войны. Остановите кровопролитие. Скажите "Нет войне!"
-> 
-> ## 🇺🇸 To Citizens of Russia
-> 
-> We at Laminas come from all over the world. Many of us have friends, family and colleagues in both Russia and Ukraine. Some of us were born in Russia. Some of us currently live in Russia. Some have grandparents who fought Nazis in World War II. Nobody here supports fascism.
-> 
-> One team member has a Ukrainian relative who fled her home with her son. The train was delayed due to bombing on the road ahead. We have friends who are hiding in bomb shelters. We anxiously follow up on them after the air raids, which indiscriminately fire at hospitals, schools, kindergartens and houses. We're not taking this from any media. These are our actual experiences.
-> 
-> You trust us enough to use our software. We ask that you trust us to say the truth on this. We need your help. Go out and protest this unnecessary war. Stop the bloodshed. Say "stop the war!"
-
 ## Introduction
 
 This is a skeleton application using the Laminas MVC layer and module
@@ -110,41 +94,6 @@ Once psalm support is present, you can run the static analysis using:
 $ composer static-analysis
 ```
 
-## Using Vagrant
-
-This skeleton includes a `Vagrantfile` based on ubuntu 18.04 (bento box)
-with configured Apache2 and PHP 7.3. Start it up using:
-
-```bash
-$ vagrant up
-```
-
-Once built, you can also run composer within the box. For example, the following
-will install dependencies:
-
-```bash
-$ vagrant ssh -c 'composer install'
-```
-
-While this will update them:
-
-```bash
-$ vagrant ssh -c 'composer update'
-```
-
-While running, Vagrant maps your host port 8080 to port 80 on the virtual
-machine; you can visit the site at http://localhost:8080/
-
-> ### Vagrant and VirtualBox
->
-> The vagrant image is based on bento/ubuntu-18.04. If you are using VirtualBox as
-> a provider, you will need:
->
-> - Vagrant 2.2.6 or later
-> - VirtualBox 6.0.14 or later
-
-For vagrant documentation, please refer to [vagrantup.com](https://www.vagrantup.com/)
-
 ## Using docker-compose
 
 This skeleton provides a `docker-compose.yml` for use with
@@ -166,6 +115,12 @@ environment is named "laminas" so you will pass that value to
 
 ```bash
 $ docker-compose run laminas composer install
+```
+
+Change permissions to cache folder to avoid errors
+```bash
+$ cd data
+$ chmod 777 cache
 ```
 
 Some composer packages optionally use additional PHP extensions.  
@@ -274,3 +229,62 @@ $ composer cs-fix
 # Run PHPUnit tests:
 $ composer test
 ```
+### Access to env variables in PHP code
+
+```php
+$name = getenv("NAME")
+```
+
+Ideal for configuration with docker-compose.yml files like this:
+
+```yml
+services:
+  laminas:
+    build: .
+    ports:
+     - "8080:80"
+    environment:
+      - NAME=Pepe
+    volumes:
+     - .:/var/www
+```
+
+### Logs
+
+Install logs package in composer.json
+
+```bash
+$ docker-compose run laminas composer require laminas/laminas-log
+```
+
+```php
+$logger = new Laminas\Log\Logger;
+$writer = new Laminas\Log\Writer\Stream('php://stdout');    
+$logger->addWriter($writer);
+
+Laminas\Log\Logger::registerErrorHandler($logger);
+Laminas\Log\Logger::registerExceptionHandler($logger);
+
+$logger->info('Informational message');
+$logger->emerg('Emergency message');
+```
+
+Also, in the web page used to show errors in the browser, add the following code to also show the error in the log:
+
+```php
+$logger = new Laminas\Log\Logger;
+$writer = new Laminas\Log\Writer\Stream('php://stdout');    
+$logger->addWriter($writer);
+
+$exLog = $this->exception->getMessage()."\r\n"
+    .get_class($this->exception)."\r\n"
+    .$this->exception->getFile().':'.$this->exception->getLine()."\r\n"
+    .$this->exception->getTraceAsString();
+
+$logger->err($exLog);
+```
+
+More information:
+* https://docs.laminas.dev/laminas-log/intro/
+* https://docs.laminas.dev/laminas-log/writers/
+* https://docs.laminas.dev/laminas-stratigility/v3/error-handlers/#handling-php-errors-and-exceptions

@@ -1,10 +1,36 @@
 <?php
+
 /**
  * @var Laminas\View\Renderer\PhpRenderer $this
  */
 ?>
 <div class="jumbotron">
     <h1 class="display-4">Welcome to<br>Laminas MVC Skeleton Application</h1>
+
+    <?php
+    print "Name is: " . getenv("NAME") . "\n";
+    ?>
+
+    <?php
+    //Logs: 
+    // https://docs.laminas.dev/laminas-log/intro/
+    // https://docs.laminas.dev/laminas-log/writers/
+    // https://docs.laminas.dev/laminas-stratigility/v3/error-handlers/#handling-php-errors-and-exceptions
+
+    $logger = new Laminas\Log\Logger;
+    $writer = new Laminas\Log\Writer\Stream('php://stdout');    
+    $logger->addWriter($writer);
+    
+    Laminas\Log\Logger::registerErrorHandler($logger);
+    Laminas\Log\Logger::registerExceptionHandler($logger);
+
+    $logger->info('Informational message');
+    $logger->emerg('Emergency message');
+
+    //Uncomment this sentence to see PHP error in Apache logs.
+    //$lll.d();
+
+    ?>
 
     <p>
         Congratulations! You have successfully installed the

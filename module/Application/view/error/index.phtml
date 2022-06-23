@@ -3,6 +3,22 @@
  * @var Laminas\View\Renderer\PhpRenderer $this
  */
 ?>
+
+<?php 
+
+$logger = new Laminas\Log\Logger;
+$writer = new Laminas\Log\Writer\Stream('php://stdout');    
+$logger->addWriter($writer);
+
+$exLog = $this->exception->getMessage()."\r\n"
+    .get_class($this->exception)."\r\n"
+    .$this->exception->getFile().':'.$this->exception->getLine()."\r\n"
+    .$this->exception->getTraceAsString();
+
+$logger->err($exLog);
+
+?>
+
 <h1>An error occurred</h1>
 <h2><?= $this->message ?></h2>
 
